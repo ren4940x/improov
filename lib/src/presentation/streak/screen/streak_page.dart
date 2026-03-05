@@ -143,6 +143,18 @@ class _StreakPageState extends ConsumerState<StreakPage> {
                         ),
                       );
                     },
+                    transitionBuilder: (context, anim1, anim2, child) {
+                      return ScaleTransition(
+                        scale: CurvedAnimation(
+                          parent: anim1,
+                          curve: Curves.easeInOutBack,
+                        ),
+                        child: FadeTransition(
+                          opacity: anim1,
+                          child: child,
+                        ),
+                      );
+                    },
                   );
                 },
                 child: Padding(

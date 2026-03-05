@@ -27,7 +27,6 @@ class _YearlySnakeGridState extends ConsumerState<YearlySnakeGrid> {
 
     return habitsAsync.when(
       data: (habits) {
-        // Try to find the habit, or return a dummy if it doesn't exist
         final habit = habits.firstWhere(
           (h) => h.id == widget.habitId,
           orElse: () {
@@ -96,24 +95,29 @@ class _YearlySnakeGridState extends ConsumerState<YearlySnakeGrid> {
                         squareColor = Theme.of(context).colorScheme.tertiary;
                       }
                     } else {
-                      // C A L E D A R
+                      // C A L E N D A R
                       final bool isWithinActiveRange = !squareDate.isBefore(activeStart) && !squareDate.isAfter(today);
 
                       if (isWithinActiveRange) {
                         if (completedDateSet.contains(dateKey)) {
-                          // Calculate completions for the week this specific date belongs to
                           final DateTime weekStart = squareDate.subtract(Duration(days: squareDate.weekday - 1));
                           final DateTime weekEnd = weekStart.add(const Duration(days: 6));
                           
-                          final int weeklyCount = habit.completedDays.where((d) {
+                          final weekCompletions = habit.completedDays.where((d) {
                             final normalized = DateTime(d.year, d.month, d.day);
                             return !normalized.isBefore(weekStart) && !normalized.isAfter(weekEnd);
-                          }).length;
+                          }).toList();
+                          
+                          weekCompletions.sort((a, b) => a.compareTo(b));
 
-                          // If completions in that week exceed the goal, make it GOLD
-                          squareColor = (weeklyCount > habit.goalDaysPerWeek) 
-                              ? const Color(0xFFFFD700) // Gold
-                              : Theme.of(context).colorScheme.tertiary;
+                          final int completionIndex = weekCompletions.indexWhere((d) => 
+                              d.year == squareDate.year && d.month == squareDate.month && d.day == squareDate.day);
+
+                          if (completionIndex >= habit.goalDaysPerWeek) {
+                            squareColor = const Color(0xFFFFD700);
+                          } else {
+                            squareColor = Theme.of(context).colorScheme.tertiary;
+                          }
                         } else if (dateKey == todayKey) {
                           squareColor = Theme.of(context).colorScheme.secondary.withOpacity(0.5);
                         }
