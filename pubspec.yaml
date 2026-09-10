@@ -92,6 +92,7 @@ flutter:
   assets:
     - assets/images/light_mode/
     - assets/images/dark_mode/
+    - assets/images/room_preview.jpg
     - .env
     - assets/icons/dark_icons/
     - assets/icons/filled_icons/

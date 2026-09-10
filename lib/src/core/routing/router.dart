@@ -1,108 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:improov/src/data/services/auth_service.dart';
-import 'package:improov/src/presentation/auth/auth_screen.dart';
-import 'package:improov/src/presentation/calendar/screen/calendar_page.dart';
-import 'package:improov/src/presentation/home/screens/home_page.dart';
-import 'package:improov/src/presentation/settings/screen/settings_page.dart';
-import 'package:improov/src/presentation/streak/screen/streak_page.dart';
-import 'package:improov/src/core/routing/page_nav.dart';
-import 'package:improov/src/presentation/profile/screen/profile_page.dart';
+import 'package:improov/src/core/routing/desk_shell.dart';
+import 'package:improov/src/presentation/diary/screen/diary_screen.dart';
 
-final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService(ref); 
-});
-
+import 'package:improov/src/presentation/home/screens/rough_wireframe_screen.dart';
+import 'package:improov/src/presentation/shop/screen/shop_screen.dart';
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-
-    //refreshListenable: ref.watch(authServiceProvider),
     initialLocation: '/',
-
-    redirect: (context, state) {
-      final authService = ref.read(authServiceProvider);
-      
-      final bool loggedIn = authService.isAuthenticated;
-      final bool loggingIn = state.matchedLocation == '/auth';
-
-      // 🛑 TEMPORARILY COMMENTED OUT FOR TESTING
-      // If NOT logged in, send them to /auth
-      //if (!loggedIn) {
-      //  return '/auth';
-      //}
-
-      // If logged in and trying to go back to /auth, send them home
-      if (loggedIn && loggingIn) {
-        return '/';
-      }
-
-      return null;
-    },
-
     routes: [
-      GoRoute(
-        path: '/auth',
-        name: 'auth',
-        builder: (context, state) => const AuthScreen(),
-      ),
-
+      // 1. Persistent Desk Shell
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return PageNav(navigationShell: navigationShell);
+          return DeskShell(navigationShell: navigationShell);
         },
         branches: [
-          // home
+          // Branch 0: Home
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) => const HomePage(),
-              ),
-            ],
-          ),
-          
-          // calendar
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/calendar',
-                builder: (context, state) => const CalendarPage(),
+                name: 'home',
+                builder: (context, state) => const RoughWireframeScreen(),
               ),
             ],
           ),
 
-          // streak
+          // Branch 1: Diary
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/streak',
-                builder: (context, state) => const StreakPage(),
+                path: '/diary',
+                name: 'diary',
+                builder: (context, state) => const DiaryScreen(),
               ),
             ],
           ),
 
-          // profile
+          // Branch 2: Shop
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfilePage(),
+                path: '/shop',
+                name: 'shop',
+                builder: (context, state) => const ShopScreen(),
               ),
             ],
           ),
         ],
       ),
 
-      //settings
+      // 2. Fullscreen Desk / Focus Mode
       GoRoute(
-        path: '/settings',
-        builder:(context, state) => const SettingsPage(),
-      )
+        path: '/desk-mode',
+        name: 'desk_mode',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const Scaffold(
+          backgroundColor: Color(0xFFFAF5E8),
+          body: Center(child: Text("Desk / Focus Mode")),
+        ),
+      ),
     ],
   );
 });
