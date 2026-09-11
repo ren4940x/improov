@@ -18,16 +18,16 @@ class CustomCheckbox extends StatelessWidget {
       side: BorderSide(
         color: value
           ? Colors.transparent
-          : Theme.of(context).colorScheme.inversePrimary,
+          : Color(0xFF7C5B3F),
         width: 1.5,
       ),
-      activeColor: Theme.of(context).colorScheme.tertiary,
+      activeColor: Color(0xFF7C5B3F),
       checkColor: Theme.of(context).colorScheme.inversePrimary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
 
       fillColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return Theme.of(context).colorScheme.tertiary;
+          return Color.fromARGB(153, 124, 91, 63);
         }
         return Colors.transparent;
       }),

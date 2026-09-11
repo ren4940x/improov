@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:improov/src/presentation/home/widgets/folder_stack/stationery_folder_stack.dart';
+import 'package:improov/src/presentation/home/widgets/ui/stationery_folder_stack.dart';
 
 class RoughWireframeScreen extends ConsumerWidget {
   const RoughWireframeScreen({super.key});
@@ -13,7 +13,6 @@ class RoughWireframeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     return Scaffold(
       backgroundColor: kBgColor,
       body: SafeArea(
@@ -72,7 +71,7 @@ class RoughWireframeScreen extends ConsumerWidget {
                         ),
                       ),
 
-                      // Top-Right: Sparks Currency Badge (Live Riverpod State)
+                      // Top-Right: Sparks Currency Badge
                       Positioned(
                         top: 14,
                         right: 14,
@@ -123,10 +122,7 @@ class RoughWireframeScreen extends ConsumerWidget {
               // 2. BOTTOM FOLDER & HABIT LIST (50% split)
               // ==========================================
               const Expanded(
-                child: StationeryFolderStack(
-                  rhythmsContent: Center(child: Text("Rhythms content mounting...")),
-                  memosContent: Center(child: Text("Memos content mounting...")),
-                ),
+                child: StationeryFolderStack(),
               ),
             ],
           ),

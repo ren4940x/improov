@@ -1,16 +1,19 @@
+// lib/src/presentation/home/widgets/folder_stack/stationery_folder_stack.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:improov/src/presentation/home/widgets/folder_stack/binders/memos_binder_painter.dart';
-import 'package:improov/src/presentation/home/widgets/folder_stack/binders/rhythms_binder_painter.dart';
+import 'package:improov/src/presentation/home/widgets/ui/binders/memos_binder_painter.dart';
+import 'package:improov/src/presentation/home/widgets/ui/binders/rhythms_binder_painter.dart';
+import 'package:improov/src/presentation/home/widgets/ui/spreads/memos_spread.dart';
+import 'package:improov/src/presentation/home/widgets/ui/spreads/rhythms_spread.dart';
 
 class StationeryFolderStack extends StatefulWidget {
-  final Widget rhythmsContent;
-  final Widget memosContent;
+  final Widget? rhythmsContent;
+  final Widget? memosContent;
 
   const StationeryFolderStack({
     super.key,
-    required this.rhythmsContent,
-    required this.memosContent,
+    this.rhythmsContent,
+    this.memosContent,
   });
 
   @override
@@ -39,7 +42,7 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
     const tabWidth = 130.0;
     const memosOffset = 116.0;
 
-    // Build the two discrete physical folders
+    // 1. Physical Rhythms Folder Shell
     final rhythmsFolder = CustomPaint(
       painter: RhythmsBinderPainter(
         fillColor: kRhythmsFill,
@@ -49,11 +52,17 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
         tabHeight: tabHeight,
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: tabHeight + 14, left: 16, right: 16, bottom: 14),
-        child: widget.rhythmsContent,
+        padding: const EdgeInsets.only(
+          top: tabHeight + 14,
+          left: 16,
+          right: 16,
+          bottom: 14,
+        ),
+        child: widget.rhythmsContent ?? const RhythmsSpread(),
       ),
     );
 
+    // 2. Physical Memos Folder Shell
     final memosFolder = CustomPaint(
       painter: MemosBinderPainter(
         fillColor: kMemosFill,
@@ -64,14 +73,21 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
         tabLeftOffset: memosOffset,
       ),
       child: Padding(
-        padding: const EdgeInsets.only(top: tabHeight + 14, left: 16, right: 16, bottom: 14),
-        child: widget.memosContent,
+        padding: const EdgeInsets.only(
+          top: tabHeight + 14,
+          left: 16,
+          right: 16,
+          bottom: 14,
+        ),
+        child: widget.memosContent ?? const MemosSpread(),
       ),
     );
 
     return Stack(
       children: [
-        // 1. Z-INDEX LAYERING: Last item in the list renders in front
+        // =========================================================
+        // 1. Z-INDEX LAYERING (Active folder paints last on top)
+        // =========================================================
         if (_activeTab == 0) ...[
           Positioned.fill(child: memosFolder),
           Positioned.fill(child: rhythmsFolder),
@@ -80,7 +96,9 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
           Positioned.fill(child: memosFolder),
         ],
 
-        // 2. TAB LABELS (Anchored to their physical tab positions)
+        // =========================================================
+        // 2. DIEGETIC TAB LABELS
+        // =========================================================
         Positioned(
           top: 0,
           left: 0,
@@ -123,7 +141,9 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
           ),
         ),
 
-        // 3. HIT-TEST GESTURE TARGETS (Floating above everything)
+        // =========================================================
+        // 3. TAB HIT-TEST TARGETS (Pinned over tab ear geometry)
+        // =========================================================
         Positioned(
           top: 0,
           left: 0,

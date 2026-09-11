@@ -1,3 +1,4 @@
+// lib/src/features/tasks/widget/task_tile.dart
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -5,10 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:improov/src/core/widgets/custom_checkbox.dart';
 import 'package:improov/src/core/widgets/focused_menu_wrapper.dart';
-import 'package:improov/src/presentation/home/widgets/modals/screen/modal.dart';
 import 'package:improov/src/data/models/task/task.dart';
-import 'package:improov/src/features/tasks/widget/task_popup.dart';
 import 'package:improov/src/features/tasks/provider/task_notifier.dart';
+import 'package:improov/src/features/tasks/widget/task_popup.dart';
+import 'package:improov/src/presentation/home/widgets/modals/screen/modal.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class TaskTile extends ConsumerStatefulWidget {
@@ -30,6 +31,12 @@ class TaskTile extends ConsumerStatefulWidget {
 class _TaskTileState extends ConsumerState<TaskTile> {
   bool _isExpanded = false;
 
+  // Memo stationery color tokens matching the warm kraft memo pad
+  static const Color _kMemoInk = Color(0xFF7C5B3F);
+  static const Color _kMemoMuted = Color(0xFFA68D75);
+  static const Color _kCaretColor = Color(0xFF9E8569);
+  static const Color _kSubtaskBranchColor = Color(0xFFD6C19D);
+
   void onEditPressed(BuildContext context) {
     showModalBottomSheet(
       context: Navigator.of(context, rootNavigator: true).context,
@@ -39,19 +46,17 @@ class _TaskTileState extends ConsumerState<TaskTile> {
     );
   }
 
-  //delete function
   void onDeletePressed() {
     ref.read(taskProvider.notifier).deleteTask(widget.task.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    //check if subtasks exists
     final hasSubtasks = widget.task.subtasks.isNotEmpty;
 
     return FocusedMenuWrapper(
       onEdit: () => onEditPressed(context),
-      onDelete: onDeletePressed, 
+      onDelete: onDeletePressed,
       onDetails: () {
         HapticFeedback.mediumImpact();
         Navigator.of(context, rootNavigator: true).push(
@@ -62,7 +67,6 @@ class _TaskTileState extends ConsumerState<TaskTile> {
             pageBuilder: (context, animation, secondaryAnimation) {
               return Stack(
                 children: [
-                  //B L U R
                   FadeTransition(
                     opacity: animation,
                     child: BackdropFilter(
@@ -70,8 +74,6 @@ class _TaskTileState extends ConsumerState<TaskTile> {
                       child: Container(color: Colors.black.withOpacity(0.2)),
                     ),
                   ),
-
-                  //P O P U P
                   TaskPopup(task: widget.task),
                 ],
               );
@@ -79,7 +81,6 @@ class _TaskTileState extends ConsumerState<TaskTile> {
           ),
         );
       },
-      
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -87,106 +88,105 @@ class _TaskTileState extends ConsumerState<TaskTile> {
           // --- MAIN TASK ROW ---
           GestureDetector(
             behavior: HitTestBehavior.translucent,
-            //tap for check/uncheck
             onTap: () {
+              HapticFeedback.lightImpact();
               ref
                   .read(taskProvider.notifier)
                   .updateTaskCompletion(widget.task.id, !widget.task.isCompleted);
+              widget.onChanged?.call(!widget.task.isCompleted);
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Material(
                 type: MaterialType.transparency,
                 child: Row(
                   children: [
-                    //checkbox
+                    // Checkbox
                     Transform.scale(
-                      scale: 1.2,
+                      scale: 1.15,
                       child: CustomCheckbox(
                         value: widget.isCompleted,
-                        onChanged: widget.onChanged, 
+                        onChanged: widget.onChanged,
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
 
-                    //task name
+                    // Task Name (Warm Sepia / Monospace Type)
                     Expanded(
                       child: Text(
-                        widget.task.title,
+                        widget.task.title.toLowerCase(),
                         style: TextStyle(
+                          fontFamily: 'monospace',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: widget.isCompleted ? Colors.grey : null,
+                          color: widget.isCompleted
+                              ? _kMemoMuted
+                              : _kMemoInk,
                           decoration: widget.isCompleted
-                            ? TextDecoration.lineThrough
-                            : null,
-                          decorationColor: widget.isCompleted
-                            ? Colors.grey
-                            : Colors.transparent,
-                          fontStyle: widget.isCompleted ? FontStyle.italic : null,
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: _kMemoMuted,
+                          fontStyle: widget.isCompleted
+                              ? FontStyle.italic
+                              : FontStyle.normal,
                         ),
                       ),
                     ),
-                    
-                    //accordion icon based on subtask's existence
+
+                    // Subtask Caret
                     if (hasSubtasks)
-                      // IconButton
                       IconButton(
                         onPressed: () {
                           setState(() => _isExpanded = !_isExpanded);
                         },
                         icon: Icon(
                           _isExpanded
-                            ? PhosphorIconsRegular.caretUp
-                            : PhosphorIconsRegular.caretDown,
-                          color: Colors.grey.shade600,
-                          size: 20,
+                              ? PhosphorIconsRegular.caretUp
+                              : PhosphorIconsRegular.caretDown,
+                          color: _kCaretColor,
+                          size: 18,
                         ),
-                        padding: const EdgeInsets.all(8.0),
-                        splashRadius: 20,
+                        padding: const EdgeInsets.all(6.0),
+                        splashRadius: 18,
                       ),
-                    
                   ],
                 ),
               ),
             ),
           ),
-          
-          //THE SUBTASKS BLOCK
+
+          // --- SUBTASKS TREE ---
           if (hasSubtasks)
             AnimatedSize(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
               child: SizedBox(
                 width: double.infinity,
                 height: _isExpanded ? null : 0.0,
                 child: Padding(
                   padding: const EdgeInsets.only(
-                    left: 34, 
-                    top: 2, 
-                    bottom: 2, 
-                    right: 10,
+                    left: 32,
+                    top: 2,
+                    bottom: 4,
+                    right: 12,
                   ),
                   child: Container(
                     decoration: const BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: Colors.grey,
-                          width: 1.5,
+                          color: _kSubtaskBranchColor,
+                          width: 1.8,
                         ),
                       ),
                     ),
-                    // Space between the vertical line and the subtasks
-                    padding: const EdgeInsets.only(left: 16.0), 
+                    padding: const EdgeInsets.only(left: 14.0),
                     child: Column(
                       children: widget.task.subtasks.map((subtask) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 1),
-
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                           child: FocusedMenuWrapper(
                             onEdit: () {
-                              // Editing from the menu opens the modal focused on this subtask
                               showModalBottomSheet(
                                 context: Navigator.of(context, rootNavigator: true).context,
                                 useSafeArea: true,
@@ -199,64 +199,62 @@ class _TaskTileState extends ConsumerState<TaskTile> {
                               );
                             },
                             onDelete: () {
-                              //Deletes specifically THIS subtask!
                               ref.read(taskProvider.notifier).deleteSubtask(
-                                widget.task.id,
-                                subtask.uuid,
-                              );
+                                    widget.task.id,
+                                    subtask.uuid,
+                                  );
                             },
-                            onDetails: () {
-                               // You can leave this empty or make it do the same as Edit
-                            },
-
+                            onDetails: () {},
                             child: GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
-                                //tapping anywhere on the row checks/unchecks it
+                                HapticFeedback.selectionClick();
                                 ref.read(taskProvider.notifier).toggleSubtaskCompletion(
-                                  widget.task.id,
-                                  subtask.uuid,
-                                  !subtask.isCompleted,
-                                );
+                                      widget.task.id,
+                                      subtask.uuid,
+                                      !subtask.isCompleted,
+                                    );
                               },
-
                               child: Row(
                                 children: [
-                                  // Subtask Checkbox
-                                  CustomCheckbox(
-                                    value: subtask.isCompleted,
-                                    onChanged: (val) {
-                                      ref.read(taskProvider.notifier).toggleSubtaskCompletion(
-                                        widget.task.id,
-                                        subtask.uuid,
-                                        val ?? false,
-                                      );
-                                    },
+                                  Transform.scale(
+                                    scale: 0.95,
+                                    child: CustomCheckbox(
+                                      value: subtask.isCompleted,
+                                      onChanged: (val) {
+                                        ref.read(taskProvider.notifier).toggleSubtaskCompletion(
+                                              widget.task.id,
+                                              subtask.uuid,
+                                              val ?? false,
+                                            );
+                                      },
+                                    ),
                                   ),
-                                  
-                                  const SizedBox(width: 12),
-                                  
-                                  // Subtask Title
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
-                                      subtask.title ?? '',
+                                      (subtask.title ?? '').toLowerCase(),
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontFamily: 'monospace',
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                        color: subtask.isCompleted ? Colors.grey : null,
+                                        color: subtask.isCompleted
+                                            ? _kMemoMuted
+                                            : _kMemoInk,
                                         decoration: subtask.isCompleted
-                                          ? TextDecoration.lineThrough
-                                          : null,
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                        decorationColor: _kMemoMuted,
                                         fontStyle: subtask.isCompleted
-                                          ? FontStyle.italic
-                                          : null,
+                                            ? FontStyle.italic
+                                            : FontStyle.normal,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         );
                       }).toList(),
                     ),
