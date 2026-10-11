@@ -59,7 +59,7 @@ class MemosBinderPainter extends CustomPainter {
       final shadowPaint = Paint()
         ..color = const Color(0x002e2b27).withOpacity(0.18)
         ..style = PaintingStyle.fill;
-      canvas.drawPath(path.shift(const Offset(0, 3)), shadowPaint);
+      canvas.drawPath(path.shift(const Offset(-5, 3)), shadowPaint);
     }
 
     // 2. Body Fill

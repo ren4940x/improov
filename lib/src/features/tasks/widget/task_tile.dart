@@ -96,7 +96,7 @@ class _TaskTileState extends ConsumerState<TaskTile> {
               widget.onChanged?.call(!widget.task.isCompleted);
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
               child: Material(
                 type: MaterialType.transparency,
                 child: Row(

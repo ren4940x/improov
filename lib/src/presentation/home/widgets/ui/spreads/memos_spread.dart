@@ -1,9 +1,9 @@
 // lib/src/presentation/home/widgets/folder_stack/spreads/memos_spread.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:improov/src/core/widgets/svg_hard_shadow.dart';
 import 'package:improov/src/features/tasks/provider/task_notifier.dart';
 import 'package:improov/src/features/tasks/widget/task_tile.dart';
+import 'package:improov/src/presentation/home/widgets/ui/paper_stacks/memo_paper_stack.dart';
 
 class MemosSpread extends ConsumerWidget {
   const MemosSpread({super.key});
@@ -31,11 +31,7 @@ class MemosSpread extends ConsumerWidget {
               left: -12.0,
               right: -8.0,
               child: IgnorePointer(
-                child: const SvgHardShadow(
-                  assetPath: 'assets/images/svg_assets/memo_card_stack.svg',
-                  offset: Offset(0, 3.5),
-                  shadowColor: Color(0x2E2E2B27),
-                ),
+                child: MemoPaperStack(),
               ),
             ),
             

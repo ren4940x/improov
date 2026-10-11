@@ -6,7 +6,7 @@ class RhythmPaperStack extends StatelessWidget {
   const RhythmPaperStack({super.key});
 
   // Tonal shadow colors for ink-on-paper look
-  static const Color _kBinderShadow = Color(0x222E2B27); // Shadow onto folder
+  static const Color _kBinderShadow = Color.fromARGB(62, 44, 38, 32);// Shadow onto folder
   static const Color _kPaperContactShadow = Color(0x1F5A3E36); // Shadow of top sheet onto bottom sheet
 
   @override
@@ -22,7 +22,7 @@ class RhythmPaperStack extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8.0, left: 6.0, right: 2.0, bottom: 2.0),
             child: const SvgHardShadow(
               assetPath: 'assets/images/svg_assets/rhythm_binder/bottom_card.svg',
-              offset: Offset(0, 3.5),
+              offset: Offset(1, 3.5),
               shadowColor: _kBinderShadow,
               fit: BoxFit.fill,
             ),
@@ -38,7 +38,7 @@ class RhythmPaperStack extends StatelessWidget {
             padding: const EdgeInsets.only(top: 2.0, left: 2.0, right: 6.0, bottom: 8.0),
             child: const SvgHardShadow(
               assetPath: 'assets/images/svg_assets/rhythm_binder/top_card.svg',
-              offset: Offset(1.5, 3.0),
+              offset: Offset(2.5, 3.0),
               shadowColor: _kPaperContactShadow,
               fit: BoxFit.fill,
             ),

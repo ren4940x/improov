@@ -98,6 +98,8 @@ flutter:
     - assets/icons/filled_icons/
     - assets/logo/
     - assets/images/svg_assets/
+    - assets/images/svg_assets/rhythm_binder/
+    - assets/images/svg_assets/memo_binder/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

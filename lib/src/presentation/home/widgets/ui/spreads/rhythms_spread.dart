@@ -1,9 +1,9 @@
 // lib/src/presentation/home/widgets/folder_stack/spreads/rhythms_spread.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:improov/src/core/widgets/svg_hard_shadow.dart';
 import 'package:improov/src/features/habits/provider/habit_notifier.dart';
 import 'package:improov/src/features/habits/widgets/habit_tile.dart';
+import 'package:improov/src/presentation/home/widgets/ui/paper_stacks/rhythm_paper_stack.dart';
 
 class RhythmsSpread extends ConsumerWidget {
   const RhythmsSpread({super.key});
@@ -22,11 +22,7 @@ class RhythmsSpread extends ConsumerWidget {
             // =========================================================
             Positioned.fill(
               child: IgnorePointer(
-                child: const SvgHardShadow(
-                  assetPath: 'assets/images/svg_assets/rhythm_card_stack.svg',
-                  offset: Offset(0, 3.5),
-                  shadowColor: Color(0x2E2E2B27),
-                ),
+                child: RhythmPaperStack(),
               ),
             ),
 
@@ -35,7 +31,7 @@ class RhythmsSpread extends ConsumerWidget {
             // =========================================================
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 22.0, 16.0, 16.0),
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
                 child: habitsAsync.when(
                   data: (habits) {
                     if (habits.isEmpty) {
@@ -82,7 +78,7 @@ class RhythmsSpread extends ConsumerWidget {
                       style: TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 12,
-                        color: Colors.red.shade400,
+                        color: Colors.red.shade300,
                       ),
                     ),
                   ),

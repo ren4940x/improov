@@ -25,15 +25,44 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
 
   // Styling Tokens
   static const kSumiInk = Color(0xFF2E2B27);
-  static const kRhythmsFill = Color(0xFFFDEEEB);
-  static const kRhythmsBorder = Color(0xFFD39A88);
-  static const kMemosFill = Color(0xFFFFFBF0);
-  static const kMemosBorder = Color(0xFFEADCC6);
+  static const kRhythmsFill = Color.fromARGB(255, 233, 217, 204);
+  static const kRhythmsBorder = Color.fromARGB(255, 192, 152, 122);
+  static const kMemosFill = Color.fromARGB(255, 250, 233, 186);
+  static const kMemosBorder = Color.fromARGB(255, 250, 233, 186);
+
 
   void _switchTab(int index) {
     if (_activeTab == index) return;
     HapticFeedback.lightImpact();
     setState(() => _activeTab = index);
+  }
+
+  // Helper to build a physical folder with the shared clean paper backing
+  Widget _buildFolderShell({
+    required CustomPainter painter,
+    required Widget content,
+    required double tabHeight,
+  }) {
+    return CustomPaint(
+      painter: painter,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: tabHeight + 14,
+          left: 14,
+          right: 14,
+          bottom: 14,
+        ),
+        child: Stack(
+          children: [
+
+            //Spread Content (Pink notes / Memos pad)
+            Positioned.fill(
+              child: content,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -43,7 +72,7 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
     const memosOffset = 116.0;
 
     // 1. Physical Rhythms Folder Shell
-    final rhythmsFolder = CustomPaint(
+    final rhythmsFolder = _buildFolderShell(
       painter: RhythmsBinderPainter(
         fillColor: kRhythmsFill,
         borderColor: kRhythmsBorder,
@@ -51,19 +80,12 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
         tabWidth: tabWidth,
         tabHeight: tabHeight,
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: tabHeight + 14,
-          left: 16,
-          right: 16,
-          bottom: 14,
-        ),
-        child: widget.rhythmsContent ?? const RhythmsSpread(),
-      ),
+      tabHeight: tabHeight,
+      content: widget.rhythmsContent ?? const RhythmsSpread(),
     );
 
     // 2. Physical Memos Folder Shell
-    final memosFolder = CustomPaint(
+    final memosFolder = _buildFolderShell(
       painter: MemosBinderPainter(
         fillColor: kMemosFill,
         borderColor: kMemosBorder,
@@ -72,15 +94,8 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
         tabHeight: tabHeight,
         tabLeftOffset: memosOffset,
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: tabHeight + 14,
-          left: 16,
-          right: 16,
-          bottom: 14,
-        ),
-        child: widget.memosContent ?? const MemosSpread(),
-      ),
+      tabHeight: tabHeight,
+      content: widget.memosContent ?? const MemosSpread(),
     );
 
     return Stack(
@@ -107,7 +122,7 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
             width: tabWidth,
             child: Center(
               child: Text(
-                "rhythms",
+                "Rhythms",
                 style: TextStyle(
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -128,7 +143,7 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
             width: tabWidth,
             child: Center(
               child: Text(
-                "memos",
+                "Memos",
                 style: TextStyle(
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.bold,
@@ -142,7 +157,7 @@ class _StationeryFolderStackState extends State<StationeryFolderStack> {
         ),
 
         // =========================================================
-        // 3. TAB HIT-TEST TARGETS (Pinned over tab ear geometry)
+        // 3. TAB HIT-TEST TARGETS
         // =========================================================
         Positioned(
           top: 0,
